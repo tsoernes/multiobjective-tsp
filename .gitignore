@@ -1,1 +1,3 @@
-'.idea/' 
+.idea/
+.results/
+.results_euclid/
