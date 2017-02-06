@@ -9,9 +9,11 @@ class TSPGenome:
     """
     A 1-D list of the cities to visit (in order)
     """
+    n_objectives = 2
+
     def __init__(self, n_cities, genotype=None):
         self.n_cities = n_cities
-        self.fitnesses = np.zeros(2, dtype='uint32')
+        self.fitnesses = np.zeros(self.n_objectives, dtype='uint32')
         self.dominates_list = None  # List of individuals that this individual dominates
         self.inverse_domination_count = float('-inf')  # Number of individuals that dominate this individual
         self.rank = -1  # Member of the n'th pareto front; 0 being the best
@@ -53,18 +55,26 @@ class TSPGenome:
         """ Even though A < B, that does not indicate that A.dominates(B),
         as A may have a lower value for fit. func. 1 but greater value for
         fit. func 2 and therefore neither dominate each other. """
-        return self.fitnesses[0] < other.fitnesses[0] or \
-            (self.fitnesses[0] == other.fitnesses[0] and
-             self.fitnesses[1] < other.fitnesses[1])
+        for i in range(len(self.fitnesses)):
+            if self.fitnesses[i] < other.fitnesses[i]:
+                return True
+            if self.fitnesses[i] > other.fitnesses[i]:
+                return False
+        return False
 
     def __gt__(self, other):
-        return self.fitnesses[0] > other.fitnesses[0] or \
-            (self.fitnesses[0] == other.fitnesses[0] and
-             self.fitnesses[1] > other.fitnesses[1])
+        for i in range(len(self.fitnesses)):
+            if self.fitnesses[i] > other.fitnesses[i]:
+                return True
+            if self.fitnesses[i] < other.fitnesses[i]:
+                return False
+        return False
 
     def __eq__(self, other):
-        return self.fitnesses[0] == other.fitnesses[0] and \
-            self.fitnesses[1] == other.fitnesses[1]
+        for i in range(len(self.fitnesses)):
+            if self.fitnesses[i] != other.fitnesses[i]:
+                return False
+        return True
 
     def __le__(self, other):
         return self.__lt__(other) or self.__eq__(other)
@@ -73,5 +83,7 @@ class TSPGenome:
         return self.__gt__(other) or self.__eq__(other)
 
     def __ne__(self, other):
-        return self.fitnesses[0] != other.fitnesses[0] and \
-            self.fitnesses[1] != other.fitnesses[1]
+        for i in range(len(self.fitnesses)):
+            if self.fitnesses[i] != other.fitnesses[i]:
+                return True
+        return False
